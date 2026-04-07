@@ -16,37 +16,6 @@ private let claudeLines = [
     "  ▘▘ ▝▝  ",
 ]
 
-private func drawClaudeGlyph(
-    char: Character,
-    row: Int,
-    col: Int,
-    cellWidth: CGFloat,
-    cellHeight: CGFloat,
-    canvasHeight: CGFloat,
-    color: NSColor,
-    attributes: [NSAttributedString.Key: Any]
-) {
-    let x = CGFloat(col) * cellWidth
-    let y = canvasHeight - CGFloat(row + 1) * cellHeight
-
-    if char == "▘" || char == "▝" {
-        let eyeWidth = cellWidth * 0.68
-        let eyeHeight = cellHeight * 0.74
-        let eyeX = x + (cellWidth - eyeWidth) / 2
-        let eyeY = y + cellHeight * 0.08
-        let eyeRect = NSRect(x: eyeX, y: eyeY, width: eyeWidth, height: eyeHeight)
-        let eyePath = NSBezierPath(roundedRect: eyeRect, xRadius: eyeWidth * 0.18, yRadius: eyeWidth * 0.18)
-        color.setFill()
-        eyePath.fill()
-        return
-    }
-
-    let glyph = String(char) as NSString
-    let glyphSize = glyph.size(withAttributes: attributes)
-    let glyphX = x + (cellWidth - glyphSize.width) / 2
-    glyph.draw(at: NSPoint(x: glyphX, y: y), withAttributes: attributes)
-}
-
 private enum Defaults {
     static let titleTemplate = "{project} ✓"
     static let descriptionTemplate = "{response}"
@@ -159,16 +128,11 @@ private func renderClaudeArt(fontSize: CGFloat) -> NSImage {
     for (row, line) in claudeLines.enumerated() {
         for (col, char) in Array(line).enumerated() {
             if char == " " { continue }
-            drawClaudeGlyph(
-                char: char,
-                row: row,
-                col: col,
-                cellWidth: cellW,
-                cellHeight: cellH,
-                canvasHeight: imgH,
-                color: color,
-                attributes: attrs
-            )
+            let s = String(char)
+            let glyphSize = (s as NSString).size(withAttributes: attrs)
+            let x = CGFloat(col) * cellW + (cellW - glyphSize.width) / 2
+            let y = imgH - CGFloat(row + 1) * cellH
+            s.draw(at: NSPoint(x: x, y: y), withAttributes: attrs)
         }
     }
 
@@ -266,7 +230,6 @@ private final class PopWindow: NSPanel {
             descriptionLabel.textColor = .secondaryLabelColor
             descriptionLabel.alignment = .left
             descriptionLabel.maximumNumberOfLines = 2
-            descriptionLabel.lineBreakMode = .byTruncatingTail
             descriptionLabel.frame = NSRect(x: textX, y: 9, width: textWidth, height: 38)
             contentView.addSubview(descriptionLabel)
         } else {

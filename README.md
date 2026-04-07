@@ -1,11 +1,5 @@
 # claude-pop
 
-```
- ▐▛███▜▌
-▝▜█████▛▘
-  ▘▘ ▝▝
-```
-
 macOS overlay notification for Claude Code. Floating toast at top-center when tasks complete.
 
 ![demo](docs/demo.png)

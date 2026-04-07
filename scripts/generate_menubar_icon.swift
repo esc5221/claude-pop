@@ -8,6 +8,37 @@ let claudeLines = [
     "  ▘▘ ▝▝  ",
 ]
 
+func drawClaudeGlyph(
+    char: Character,
+    row: Int,
+    col: Int,
+    cellWidth: CGFloat,
+    cellHeight: CGFloat,
+    origin: CGPoint,
+    color: NSColor,
+    attributes: [NSAttributedString.Key: Any]
+) {
+    let x = origin.x + CGFloat(col) * cellWidth
+    let y = origin.y + CGFloat(claudeLines.count - row - 1) * cellHeight
+
+    if char == "▘" || char == "▝" {
+        let eyeWidth = cellWidth * 0.72
+        let eyeHeight = cellHeight * 0.76
+        let eyeX = x + (cellWidth - eyeWidth) / 2
+        let eyeY = y + cellHeight * 0.08
+        let eyeRect = NSRect(x: eyeX, y: eyeY, width: eyeWidth, height: eyeHeight)
+        let eyePath = NSBezierPath(roundedRect: eyeRect, xRadius: eyeWidth * 0.18, yRadius: eyeWidth * 0.18)
+        color.setFill()
+        eyePath.fill()
+        return
+    }
+
+    let glyph = String(char) as NSString
+    let glyphSize = glyph.size(withAttributes: attributes)
+    let glyphX = x + (cellWidth - glyphSize.width) / 2
+    glyph.draw(at: CGPoint(x: glyphX, y: y), withAttributes: attributes)
+}
+
 let canvas = CGSize(width: 72, height: 72)
 let image = NSImage(size: canvas)
 
@@ -35,11 +66,16 @@ let attributes: [NSAttributedString.Key: Any] = [
 for (row, line) in claudeLines.enumerated() {
     for (column, character) in Array(line).enumerated() {
         if character == " " { continue }
-        let glyph = String(character) as NSString
-        let glyphSize = glyph.size(withAttributes: attributes)
-        let x = origin.x + CGFloat(column) * cellWidth + (cellWidth - glyphSize.width) / 2
-        let y = origin.y + CGFloat(claudeLines.count - row - 1) * cellHeight
-        glyph.draw(at: CGPoint(x: x, y: y), withAttributes: attributes)
+        drawClaudeGlyph(
+            char: character,
+            row: row,
+            col: column,
+            cellWidth: cellWidth,
+            cellHeight: cellHeight,
+            origin: origin,
+            color: .black,
+            attributes: attributes
+        )
     }
 }
 

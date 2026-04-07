@@ -8,6 +8,38 @@ let claudeLines = [
     "  ▘▘ ▝▝  ",
 ]
 
+func drawClaudeGlyph(
+    char: Character,
+    row: Int,
+    col: Int,
+    cellWidth: CGFloat,
+    cellHeight: CGFloat,
+    padding: CGFloat,
+    canvasHeight: CGFloat,
+    color: NSColor,
+    attributes: [NSAttributedString.Key: Any]
+) {
+    let x = padding + CGFloat(col) * cellWidth
+    let y = padding + CGFloat(claudeLines.count - row - 1) * cellHeight
+
+    if char == "▘" || char == "▝" {
+        let eyeWidth = cellWidth * 0.72
+        let eyeHeight = cellHeight * 0.76
+        let eyeX = x + (cellWidth - eyeWidth) / 2
+        let eyeY = y + cellHeight * 0.08
+        let eyeRect = NSRect(x: eyeX, y: eyeY, width: eyeWidth, height: eyeHeight)
+        let eyePath = NSBezierPath(roundedRect: eyeRect, xRadius: eyeWidth * 0.16, yRadius: eyeWidth * 0.16)
+        color.setFill()
+        eyePath.fill()
+        return
+    }
+
+    let glyph = String(char) as NSString
+    let glyphSize = glyph.size(withAttributes: attributes)
+    let glyphX = x + (cellWidth - glyphSize.width) / 2
+    glyph.draw(at: CGPoint(x: glyphX, y: y), withAttributes: attributes)
+}
+
 func glyphImage(fontSize: CGFloat, color: NSColor, padding: CGFloat) -> NSImage {
     let font = NSFont(name: "Menlo-Bold", size: fontSize)
         ?? NSFont.monospacedSystemFont(ofSize: fontSize, weight: .bold)
@@ -28,11 +60,17 @@ func glyphImage(fontSize: CGFloat, color: NSColor, padding: CGFloat) -> NSImage 
     for (row, line) in claudeLines.enumerated() {
         for (column, character) in Array(line).enumerated() {
             if character == " " { continue }
-            let glyph = String(character) as NSString
-            let glyphSize = glyph.size(withAttributes: attributes)
-            let x = padding + CGFloat(column) * cellWidth + (cellWidth - glyphSize.width) / 2
-            let y = padding + CGFloat(claudeLines.count - row - 1) * cellHeight
-            glyph.draw(at: CGPoint(x: x, y: y), withAttributes: attributes)
+            drawClaudeGlyph(
+                char: character,
+                row: row,
+                col: column,
+                cellWidth: cellWidth,
+                cellHeight: cellHeight,
+                padding: padding,
+                canvasHeight: height,
+                color: color,
+                attributes: attributes
+            )
         }
     }
 
